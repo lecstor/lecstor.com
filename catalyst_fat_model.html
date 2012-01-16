@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Using Catalyst with a Fat Model</title>
+    <meta name="description" content="Make your app more modular by not putting all your business login in your Catalyst controllers.">
+    <meta name="author" content="Jason Galea">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles http://twitter.github.com/bootstrap/1.4.0 -->
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <style type="text/css">
+      body {
+        padding-top: 10px;
+      }
+      section {
+          padding-top: 60px;
+      }
+      .hero-unit h1 {
+          font-size: 45px;
+      }
+      .hero-unit {
+          padding: 40px;
+      }
+    </style>
+
+    <!-- Le fav -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27611712-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+  </head>
+
+  <body>
+
+    <div class="topbar">
+      <div class="fill">
+        <div class="container">
+          <a class="brand" href="#">Lecstor</a>
+          <ul class="nav">
+            <li class="active"><a href="/">Home</a></li>
+            <li><a href="/#about">About</a></li>
+            <li><a href="/#contact">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container span11">
+
+      <section>
+
+          <div class="page-header">
+              <div class="row">
+                  <div class="span10">
+                      <h1>Using Catalyst with a Fat Model</h1>
+                  </div>
+                  <div class="span1">3/12/11</div>
+              </div>
+          </div>
+
+          <p>This Christmas do yourself a favour and get fat! with a fat model! what could be sweeter?</p>
+          <p>Of course we're talking about a Catalyst Model as in Model, View, Controller. When I started using Catalyst and eventually got my head around all the parts and where they all fit in, the slot for my &quot;business logic&quot; seemed to be in the Controllers and I think that's a common assumption.</p>
+          <p>The first thing that got my spidey sense tingling about this approach was when I realised I had multiple Actions with the same code. I'm very, very DRY so that bugged me a lot. Because I was in a Controller my first attempts at fixing this resulted in lots of forwarding between Actions both private and not.. this gets very messy, very quickly.</p>
+          <p>Ok, so why not regular methods in the Controllers which are called from your Actions? This is a better solution wherever possible but I must admit it makes me feel icky.. a Controller is a place for Actions and for clarity, modularity, etc, I prefer to keep everything else out..</p>
+          <p>To this end I looked to the model, the next (first?) obvious place to put these common methods. At this stage I was still trying to fit my code into Catalyst and made a couple of attempts at small Models for targeted functionality but then ran into issues from wanting access from one Model to another. At the same time I also discovered the issues involved in accessing Catalyst code from cron scripts and the like..</p>
+          <p>ok, finally, my current solution? the fat Model. Essentially it's your whole app wrapped up in it's own nice &quot;little&quot; module..</p>
+
+          <h3>My App</h3>
+
+          <pre>
+    package My::App;
+    use Moose;
+
+    has 'config'    =&gt; ( isa =&gt; 'My::App::Config', is =&gt; 'ro', required =&gt; 1 );
+
+    has 'schema'    =&gt; ( isa =&gt; 'DBIx::Class::Schema', is =&gt; 'ro', required =&gt; 1 );
+
+    has 'template' =&gt; ( isa =&gt; 'Template', is =&gt; 'ro' );
+
+    has 'visitor' =&gt; ( isa =&gt; 'My::App::Visitor', is =&gt; 'ro' );
+
+    has 'products' =&gt; ( isa =&gt; 'My::App::Products', is =&gt; 'ro', lazy_build =&gt; 1 );
+
+    sub _build_products{
+        My::App::Products-&gt;new({ schema =&gt; $_[0]-&gt;schema });
+    }
+          </pre>
+          <p>With this as an entry point I can easily write a script which uses this class to access the full functionality of my app. I've also skipped a lot of coercing and auto-building in this example which you can use to make things even simpler.</p>
+          <p>ok, but I thought we were talking about Models?</p>
+
+          <h3>My App Model</h3>
+
+          <pre>
+    package My::Catalyst::Model::MyApp;
+    use Moose;
+    extends 'Catalyst::Model::Factory::PerRequest';
+
+    __PACKAGE__-&gt;config( class =&gt; 'My::App' );
+
+    # Instantiate the main app for each request.
+    sub prepare_arguments {
+        my ($self, $c) = @_;
+
+        my $args = $c-&gt;config-&gt;{'Model::MyApp'}{args};
+
+        $args-&gt;{template} = $c-&gt;view('TT')-&gt;template;
+        $args-&gt;{schema} = $c-&gt;model('DB')-&gt;schema;
+
+        $c-&gt;session unless $c-&gt;sessionid;
+
+        my $visitor = { session_id =&gt; $c-&gt;sessionid };
+        $visitor-&gt;{user} = $c-&gt;user if $c-&gt;user_exists;
+
+        $args-&gt;{visitor} = My::App::Visitor-&gt;new($visitor);
+
+        return $args;
+    }
+
+    no Moose;
+    __PACKAGE__-&gt;meta-&gt;make_immutable();
+
+    1;
+
+          </pre>
+          <p>With this model in my Catalyst app I can now access my main app from wherever I need within the Catalsyt system via $c-&gt;model('MyApp'). I'm also reusing things that Catalyst makes simple like my database model and template object. I use the template object when creating system emails in my app and there's no reason to instantiate a new Template object each time, and I can set it up once and know the same instance will be used everywhere.</p>
+
+          <h3>My Controller</h3>
+
+          <pre>
+    package My::Catalyst::Controller::Root;
+    use Moose;
+    use namespace::autoclean;
+
+    BEGIN { extends 'Catalyst::Controller' }
+
+    __PACKAGE__-&gt;config(namespace =&gt; '');
+
+    sub index : Local{
+        my ( $self, $c ) = @_;
+
+        my $app = $c-&gt;model('MyApp');
+
+        $c-&gt;stash({
+            template =&gt; 'index.tt',
+            latest_products =&gt; $app-&gt;products-&gt;latest
+        });
+    }
+          </pre>
+          <p>Now I can use Catalyst for all the wonderful things it makes so easy while keeping my main app nicely separated from it. Oh, and just quietly.. if the sky turned green and I needed to set up a quick Dancer or Mojolicious app I could do that quite easily too..</p>
+          <p>cheers,</p>
+          <p>J</p>
+
+      </section>
+
+      <div style="margin-top: 600px"></div>
+
+      <footer>
+        <p>&copy; Jason Galea 2011</p>
+      </footer>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>
