@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Lecstor's Blog]]></title><description><![CDATA[Things I might want to know again later.]]></description><link>https://lecstor.com/</link><generator>RSS for Node</generator><lastBuildDate>Sun, 09 Dec 2018 02:34:47 GMT</lastBuildDate><item><title><![CDATA[Building a PDF writer]]></title><description><![CDATA[A PDF file is basically a set of object serialised in a specific format similar to PostScript. Our initial goal is to be able to place text…]]></description><link>https://lecstor.com//building-a-pdf-writer/</link><guid isPermaLink="false">https://lecstor.com//building-a-pdf-writer/</guid><pubDate>Fri, 10 Feb 2017 03:49:00 GMT</pubDate><content:encoded>&lt;p&gt;A PDF file is basically a set of object serialised in a specific format similar to PostScript. Our initial goal is to be able to place text in a PDF by writing the required objects in the correct format but today we’ll just start with the overall layout of the PDF file source.&lt;/p&gt;
+&lt;p&gt;The first thing we write to the file is the PDF header which consists of the PDF version and 4 binary characters to ensure readers know the file contains binary.&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;%PDF-1.4
+%ÿÿÿÿ&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;After that we add the objects which will lay out the document. Each object begins with an id followed by a dictionary and an optional stream. We won’t be working with streams this round.&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;1 0 obj
+&amp;lt;&amp;lt;
+  /Type /Catalog
+  /Pages 2 0 R
+&amp;gt;&amp;gt;
+endobj&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Following the objects we put down the &lt;code class=&quot;language-text&quot;&gt;xref&lt;/code&gt;. The &lt;code class=&quot;language-text&quot;&gt;xref&lt;/code&gt; is an index of the objects in the file to help readers locate them quickly (and add a bit more info in PDF files that have been modified).&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;xref
+0 3
+0000000000 65535 f
+0000000222 00000 n
+0000000031 00000 n&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Each object in the file needs to have a record in the &lt;code class=&quot;language-text&quot;&gt;xref&lt;/code&gt; which points to the object’s location in bytes from the start of the file so as we write out objects we need to keep track of where they are being written. To do this we will keep a tally of the lengths of data we write and record it’s value before writing each object.&lt;/p&gt;
+&lt;p&gt;To finish off we need to add a Trailer and a pointer to the start of the &lt;code class=&quot;language-text&quot;&gt;xref&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;trailer
+&amp;lt;&amp;lt; /Size 7 /Root 6 0 R
+/ID [&amp;lt;abc123&amp;gt;&amp;lt;abc123&amp;gt;]
+&amp;gt;&amp;gt;
+startxref
+521
+%%EOF&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The example code below is Javascript (ES6) but would be easily translated to others.&lt;/p&gt;
+&lt;p&gt;Let’s create the file and write the header..&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;let fileOffset = 0;
+const pdf = fs.createWriteStream(`hello-world.pdf`);
+
+const head = new Buffer(`%PDF-1.4\n%\xFF\xFF\xFF\xFF\n`, &amp;#39;binary&amp;#39;);
+
+// update fileOffset to point to the next object&amp;#39;s position
+fileOffset += head.length;
+pdf.write(head);&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;And our first (and only) object; we’ll add the catalog..&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;(the funky formatting is to ensure the correct newlines without a bunch of \n)&lt;/em&gt;&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;let cat = `1 0 obj
+&amp;lt;&amp;lt; /Type /Catalog /Pages 2 0 R &amp;gt;&amp;gt;
+endobj
+`;
+
+// record the position the catalog will be written at
+let offsets = { 1: fileOffset };
+
+cat = new Buffer(cat, &amp;#39;binary&amp;#39;);
+fileOffset += cat.length;
+pdf.write(cat);&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Once we’ve added our objects to the file we can add our &lt;code class=&quot;language-text&quot;&gt;xref&lt;/code&gt; (we don’t have nearly enough for a valid PDF yet, we’ll add those next time).&lt;/p&gt;
+&lt;p&gt;For a new PDF each object in our file needs a line in the &lt;code class=&quot;language-text&quot;&gt;xref&lt;/code&gt; consisting of it’s location in bytes from the start of the file followed by &lt;code class=&quot;language-text&quot;&gt;&amp;quot; 0000 n”&lt;/code&gt; which relates to the version of the object and it’s active state and only needs to change if an existing PDF is being modified.&lt;/p&gt;
+&lt;p&gt;The lines in the &lt;code class=&quot;language-text&quot;&gt;xref&lt;/code&gt; must be sorted by object id and the ids must be sequential.&lt;/p&gt;
+&lt;p&gt;We also need to record the file offset of the &lt;code class=&quot;language-text&quot;&gt;xref&lt;/code&gt; for the PDF footer.&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;const xrefOffset = fileOffset;
+const fontOffset = `0000000000${offsets[&amp;#39;1&amp;#39;]}`.slice(-10);
+const count = Object.keys(offsets).length;
+
+const xref = `xref
+0 ${count}
+0000000000 65535 f
+${fontOffset} 00000 n
+`;
+
+pdf.write(xref);&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;After the &lt;code class=&quot;language-text&quot;&gt;xref&lt;/code&gt; comes the &lt;code class=&quot;language-text&quot;&gt;trailer&lt;/code&gt; containing a dictionary telling the reader how many &lt;code class=&quot;language-text&quot;&gt;xref&lt;/code&gt; entries there are, the root object’s id, and the document’s id amongst other things.&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;pdf.write(`trailer
+&amp;lt;&amp;lt;
+  /Size 7
+  /Root 1 0 R
+  /ID [&amp;lt;abc123&amp;gt;, &amp;lt;abc123&amp;gt;]
+&amp;gt;&amp;gt;
+`);&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Then we finish it off with a pointer to the start of the xref where the reader knows where to find it near the end of the file.&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;pdf.write(`startxref
+${xrefOffset}
+%%EOF
+`);&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The file that is created is valid PDF markup, but is incomplete so won’t open in a PDF viewer. We’ll need to add some more objects such as Pages, Page, Font, ProcSet, Resource, and Content, but that’s probably enough for today.&lt;/p&gt;</content:encoded></item><item><title><![CDATA[MongoDB Upgrade 2.4 to 2.6 in Debian]]></title><description><![CDATA[When upgrading to the latest and greatest MongoDB (2.6) the first thing you have to do is run a check on your databases. Specifically the…]]></description><link>https://lecstor.com//mongodb-upgrade-24-to-26-in-debian/</link><guid isPermaLink="false">https://lecstor.com//mongodb-upgrade-24-to-26-in-debian/</guid><pubDate>Tue, 13 May 2014 22:13:03 GMT</pubDate><content:encoded>&lt;p&gt;When upgrading to the latest and greatest MongoDB (2.6) the first thing you have to do is run a check on your databases. Specifically the &lt;a href=&quot;http://docs.mongodb.org/manual/release-notes/2.6-upgrade/&quot;&gt;upgrade docs&lt;/a&gt; say:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;To begin the upgrade procedure, connect a 2.6 mongo shell to your MongoDB 2.4 mongos or mongod and run the db.upgradeCheckAllDBs() to check your data set for compatibility.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Tightly constrained by the box, I wondered how I could install a 2.6 mongo shell on my Debian system without upgrading the whole shebang.. turns out there’s no need.. just download the tar version of MongoDB and run the shell straight from there..&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;$ curl -O http://downloads.mongodb.org/linux/mongodb-linux-x86_64-2.6.1.tgz
+$ tar -zxvf mongodb-linux-x86_64-2.6.1.tgz
+$ ./mongodb-linux-x86_64-2.6.1/bin/mongo&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;to run the check, you also need to be using the admin database, so..&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;&amp;gt; use admin
+switched to db admin
+&amp;gt; db.upgradeCheckAllDBs()
+
+Checking database mydb1
+
+Checking collection mydb1.coll1
+
+Checking collection mydb1.coll2
+
+Checking database mydb2
+
+Checking collection mydb2.coll1
+
+Checking collection mydb2.coll2
+
+Everything is ready for the upgrade!
+true
+&amp;gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content:encoded></item><item><title><![CDATA[How to create PDF documents]]></title><description><![CDATA[Adobe’s Portable Document Format (PDF) files have almost become the standard for preparing well-formatted documents. There are PDF readers…]]></description><link>https://lecstor.com//how-to-create-pdf-documents/</link><guid isPermaLink="false">https://lecstor.com//how-to-create-pdf-documents/</guid><pubDate>Mon, 21 Apr 2014 17:15:00 GMT</pubDate><content:encoded>&lt;blockquote&gt;
+&lt;p&gt;Adobe’s Portable Document Format (PDF) files have almost become the standard for preparing well-formatted documents. There are PDF readers/displayers for most web browsers, so there is no real excuse for not providing this kind of formatted document to your users if your web application demands its use. Standardized forms and statistical reports can all be drawn from a web system’s data, so it makes sense to format that data in a common layout. &lt;a href=&quot;http://people.oreilly.com/adfm&quot;&gt;Adam Flaherty&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Example uses for dynamically generated PDFs include orders, receipts, invoices, packing slips, event tickets, reports, certificates, booking details and anything else that would benefit from a well supported printable document format that can easily be sent to others and stored for archival purposes.&lt;/p&gt;
+&lt;p&gt;I created (and continue to develop) &lt;a href=&quot;https://docca.io&quot;&gt;Docca&lt;/a&gt; as a web service to ease the pain of implementing dynamic PDF files from your web site or service. Docca uses bespoke layout and PDF engines to generate documents from XML based document source generated by combining JSON data and applicable templates.&lt;/p&gt;
+&lt;p&gt;In researching the challenges inherent in PDF generation and the solutions available I gathered together some related articles and the libraries they use. I hope this might help you to get up to speed quickly and find the best solution for your situation.&lt;/p&gt;
+&lt;h2&gt;Articles&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;http://rick.measham.id.au/pdf-api2/&quot;&gt;Using PDF::API2&lt;/a&gt;
+&lt;em&gt;A Tutorial by Example - This document is designed to teach you to drive PDF::API2, the most comprehensive toolkit for creating PDF files from Perl. It wont teach you PDF. If you want to learn PDF, Adobe have the full specification available for download on their website.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://lukesthoughtdump.blogspot.com.au/2010/05/pdfapi2-is-underrated.html&quot;&gt;PDF::API2 is Underrated&lt;/a&gt;
+&lt;em&gt;This is by no means a tutorial, or even an introduction to PDF::API2 … this is more of a coredump of the part of my brain that knows PDF, so to speak.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://docs.djangoproject.com/en/dev/howto/outputting-pdf/&quot;&gt;Outputting PDFs with Django&lt;/a&gt;
+&lt;em&gt;This document explains how to output PDF files dynamically using Django views. This is made possible by the excellent, open-source ReportLab Python PDF library.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://answers.oreilly.com/topic/1414-how-to-generate-a-pdf-with-php/&quot;&gt;How to Generate a PDF With PHP&lt;/a&gt;
+&lt;em&gt;Creating a PDF with PHP can be relatively straightforward. However, knowing what library to use and how to deal with errors can help you cut back on the tedious work associated with generating a PDF.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://viget.com/extend/how-to-create-pdfs-in-rails&quot;&gt;How To Create PDFs in Rails&lt;/a&gt;
+&lt;em&gt;We worked with The Bill of Rights Institute recently to create an interactive digital course for American History teachers. One of the interesting challenges, among many, stemmed from the fact that the project had large sections of readable content. One of our goals was to make it easy for students and teachers to print out their reading material if and when they’re not able to read it on screen.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://shellycloud.com/blog/2014/01/generating-pdfs-with-custom-fonts-using-wkhtmltopdf&quot;&gt;Generating PDFs with custom fonts using wkhtmltopdf&lt;/a&gt;
+&lt;em&gt;Generating PDF files with custom fonts can be tricky. In this tutorial we will create a simple Rails app and tackle this problem with two tools: wicked&lt;/em&gt;pdf and wkhtmltopdf._&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://newexception.com/html-to-pdf-php&quot;&gt;Generate PDF from HTML using wkhtmltopdf and PHP&lt;/a&gt;
+&lt;em&gt;God knows what i have tried in order to generate PDF files using php. I tried the FPDF and TCPDF library. Yes, it was easy to create simple tables, but when i came to the part which involves adding images into tables it was huge pain. I could not generate the desired layout until i found a great utility called wkhtmltopdf.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.yiiframework.com/wiki/529/create-generate-pdf-files-with-tcpdf-plugin-example-to-generate-table-with-tcpdf-plugin/&quot;&gt;Create / Generate PDF files with TCPDF plugin&lt;/a&gt;
+&lt;em&gt;Few days ago i was playing with TCPF plugin to create a PDF files. Since i have checked few available extension and also checked some forum threads but still i dont get my expected result for PDF file.&lt;/em&gt;&lt;/p&gt;
+&lt;h2&gt;Libraries&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://metacpan.org/release/PDF-API2&quot;&gt;PDF::API2&lt;/a&gt; (Perl)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.reportlab.com/opensource/&quot;&gt;ReportLab open-source PDF Toolkit&lt;/a&gt; (Python)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/prawnpdf/prawn&quot;&gt;Prawn&lt;/a&gt; (Ruby)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/pdfkit/pdfkit&quot;&gt;pdfkit&lt;/a&gt; (Ruby)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/mileszs/wicked_pdf&quot;&gt;wicked_pdf&lt;/a&gt; (Ruby)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://fpdf.org/&quot;&gt;FPDF&lt;/a&gt; (PHP)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.tcpdf.org/&quot;&gt;TCPDF&lt;/a&gt; (PHP)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://parall.ax/products/jspdf&quot;&gt;jsPDF&lt;/a&gt; (Javascript)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.princexml.com/&quot;&gt;Prince&lt;/a&gt; (Javascript)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://wkhtmltopdf.org/&quot;&gt;wkhtmltopdf&lt;/a&gt; (command line)&lt;/li&gt;
+&lt;/ul&gt;</content:encoded></item><item><title><![CDATA[Something about Perl]]></title><description><![CDATA[Perl is used extensively all over the world in production, doing the job, all the time. Modern Perl takes the solid base that is Perl5 an…]]></description><link>https://lecstor.com//something-about-perl/</link><guid isPermaLink="false">https://lecstor.com//something-about-perl/</guid><pubDate>Tue, 17 Jan 2012 09:06:00 GMT</pubDate><content:encoded>&lt;p&gt;Perl is used extensively all over the world in production, doing the job, all the time. Modern Perl takes the solid base that is Perl5 an implements all the goodness of modern programming practices. Perl has been in intensive use for more than 10 years and there are many examples of it’s use that are very out of date. When searching for Perl references on the ‘net, please make sure you restrict your search to the last 12 months.. there has been extensive progress in recent times.&lt;/p&gt;
+&lt;h2&gt;TMTOWTDI - There’s More Than One Way To Do It&lt;/h2&gt;
+&lt;p&gt;This has it’s detractors and is certainly open to abuse. Other languages have the opposite view and believe in The One True Way. Reasons for this mostly boil down to making things easier to get started, but the real world just isn’t that simple. My problem with this is that my favourite answer as a developer to “Can we…?” is “Yes. We can do anything”. And with Perl I have never been proven wrong.&lt;/p&gt;
+&lt;h2&gt;Web Frameworks&lt;/h2&gt;
+&lt;h3&gt;&lt;a href=&quot;http://www.catalystframework.org/&quot;&gt;Catalyst&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The elegant MVC framework. Catalyst will make web development something you had never expected it to be: Fun, rewarding and quick.&lt;/p&gt;
+&lt;h3&gt;&lt;a href=&quot;http://perldancer.org/&quot;&gt;Dancer&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;PerlDancer is a micro perl web framework designed to be as effortless as possible for the developer. With PerlDancer, web development is fun again. It’s a very expressive DSL for writing web applications with tons of plugins and a very dynamic community.&lt;/p&gt;
+&lt;h3&gt;&lt;a href=&quot;http://mojolicio.us/&quot;&gt;Mojolicious&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Powerful out of the box with RESTful routes, plugins, Perl-ish templates, session management, signed cookies, testing framework, static file server, I18N, first class unicode support and much more for you to discover.&lt;/p&gt;
+&lt;h2&gt;Templates&lt;/h2&gt;
+&lt;h3&gt;&lt;a href=&quot;http://template-toolkit.org/&quot;&gt;Template Toolkit&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The Template Toolkit is a fast, flexible and highly extensible template processing system. It is Free (in both senses: free beer and free speech), Open Source software and runs on virtually every modern operating system known to man. It is mature, reliable and well documented, and is used to generate content for countless web sites ranging from the very small to the very large.&lt;/p&gt;
+&lt;h2&gt;Web Server Interface&lt;/h2&gt;
+&lt;h3&gt;&lt;a href=&quot;http://plackperl.org/&quot;&gt;PSGI/Plack&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;PSGI is an interface between Perl web applications and web servers, and Plack is a Perl module and toolkit that contains PSGI middleware, helpers and adapters to web servers.&lt;/p&gt;
+&lt;h2&gt;Object Systems&lt;/h2&gt;
+&lt;p&gt;Perl isn’t OO.. Perl is ugly.. You have to bless hashes to make objects.. blah.. blah.. blah.. That’s old school Perl. It’s still there if you need it, so you can still run those legacy scripts with the latest Perl5, but you don’t have to. We have Moose! It’s Modern Perl, dude, it’s a brave new world.&lt;/p&gt;
+&lt;h3&gt;&lt;a href=&quot;http://moose.iinteractive.com/&quot;&gt;Moose&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Moose is a postmodern object system for Perl 5 that takes the tedium out of writing object-oriented Perl. It borrows all the best features from Perl 6, CLOS (Lisp), Smalltalk, Java, BETA, OCaml, Ruby and more, while still keeping true to its Perl 5 roots.&lt;/p&gt;
+&lt;h3&gt;&lt;a href=&quot;http://search.cpan.org/~gfuji/Mouse-0.97/lib/Mouse.pm&quot;&gt;Mouse&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Moose is a postmodern object system for Perl5. Moose is wonderful. Unfortunately, Moose has a compile-time penalty. Though significant progress has been made over the years, the compile time penalty is a non-starter for some very specific applications. If you are writing a command-line application or CGI script where startup time is essential, you may not be able to use Moose (we recommend that you instead use persistent Perl executing environments like FastCGI for the latter, if possible). Mouse is a Moose compatible object system, which aims to alleviate this penalty by providing a subset of Moose’s functionality.&lt;/p&gt;
+&lt;h2&gt;IOC Framework&lt;/h2&gt;
+&lt;h3&gt;&lt;a href=&quot;http://search.cpan.org/dist/Bread-Board/lib/Bread/Board.pm&quot;&gt;Bread::Board&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Bread::Board is an inversion of control framework with a focus on dependency injection and lifecycle management. It’s goal is to help you write more decoupled objects and components by removing the need for you to manually wire those objects/components together.&lt;/p&gt;
+&lt;h2&gt;Database Interfaces&lt;/h2&gt;
+&lt;h3&gt;&lt;a href=&quot;http://www.dbix-class.org/&quot;&gt;DBIx::Class&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;DBIC is an extensible and flexible Object/Relational Mapper written in Perl. ORMs speed development, abstract data and make it portable, allow you to represent your business rules through OO code and generate boilerplate code for CRUD operations.&lt;/p&gt;
+&lt;h2&gt;Database Deployment&lt;/h2&gt;
+&lt;h3&gt;&lt;a href=&quot;http://search.cpan.org/~frew/DBIx-Class-DeploymentHandler-0.001005/lib/DBIx/Class/DeploymentHandler.pm&quot;&gt;DBIx::Class::DeploymentHandler&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;DBIx::Class::DeploymentHandler is, as its name suggests, a tool for deploying and upgrading databases with DBIx::Class. It is designed to be much more flexible than DBIx::Class::Schema::Versioned, hence the use of Moose and lots of roles.&lt;/p&gt;
+&lt;h3&gt;&lt;a href=&quot;https://github.com/jjn1056/DBIx-Class-Migration&quot;&gt;DBIx::Class::Migration&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;DBIx::Class::Migration defines some logic which combines both DBIx::Class::DeploymentHandler and DBIx::Class::Fixtures, along with a standard tutorial, to give you a simple and straightforward approach to solving the problem of how to best create database versions, migrations and testing data. It offers code and advice based on my experience of using DBIx::Class for several years, which hopefully can help you bootstrap out of the void.&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Using Catalyst with a Fat Model]]></title><description><![CDATA[Today I’m going to talk about using a fat model in Catalyst. When I started using Catalyst and eventually got my head around all the parts…]]></description><link>https://lecstor.com//using-catalyst-with-a-fat-model/</link><guid isPermaLink="false">https://lecstor.com//using-catalyst-with-a-fat-model/</guid><pubDate>Sun, 04 Dec 2011 09:01:37 GMT</pubDate><content:encoded>&lt;p&gt;Today I’m going to talk about using a fat model in Catalyst. When I started using Catalyst and eventually got my head around all the parts and where they all fit in, the slot for my “business logic” seemed to be in the Controllers and I think that’s a common assumption.&lt;/p&gt;
+&lt;p&gt;The first thing that got my spidey sense tingling about this approach was when I realised I had multiple Actions with the same code. I’m very, very DRY so that bugged me a lot. Because I was in a Controller my first attempts at fixing this resulted in lots of forwarding between Actions both private and not.. this gets very messy, very quickly.&lt;/p&gt;
+&lt;p&gt;Ok, so why not regular methods in the Controllers which are called from your Actions? This is a better solution wherever possible but I must admit it makes me feel icky.. a Controller is a place for Actions and for clarity, modularity, etc, I prefer to keep everything else out..&lt;/p&gt;
+&lt;p&gt;To this end I looked to the model, the next (first?) obvious place to put these common methods. At this stage I was still trying to fit my code into Catalyst and made a couple of attempts at small Models for targeted functionality but then ran into issues from wanting access from one Model to another. At the same time I also discovered the issues involved in accessing Catalyst code from cron scripts and the like..&lt;/p&gt;
+&lt;p&gt;ok, finally, my current solution? the fat Model. Essentially it’s your whole app wrapped up in it’s own nice “little” module..&lt;/p&gt;
+&lt;h3&gt;My App&lt;/h3&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;package My::App;
+use Moose;
+
+has &amp;#39;config&amp;#39;    =&amp;gt; ( isa =&amp;gt; &amp;#39;My::App::Config&amp;#39;, is =&amp;gt; &amp;#39;ro&amp;#39;, required =&amp;gt; 1 );
+
+has &amp;#39;schema&amp;#39;    =&amp;gt; ( isa =&amp;gt; &amp;#39;DBIx::Class::Schema&amp;#39;, is =&amp;gt; &amp;#39;ro&amp;#39;, required =&amp;gt; 1 );
+
+has &amp;#39;template&amp;#39; =&amp;gt; ( isa =&amp;gt; &amp;#39;Template&amp;#39;, is =&amp;gt; &amp;#39;ro&amp;#39; );
+
+has &amp;#39;visitor&amp;#39; =&amp;gt; ( isa =&amp;gt; &amp;#39;My::App::Visitor&amp;#39;, is =&amp;gt; &amp;#39;ro&amp;#39; );
+
+has &amp;#39;products&amp;#39; =&amp;gt; ( isa =&amp;gt; &amp;#39;My::App::Products&amp;#39;, is =&amp;gt; &amp;#39;ro&amp;#39;, lazy_build =&amp;gt; 1 );
+
+sub _build_products{
+    My::App::Products-&amp;gt;new({ schema =&amp;gt; $_[0]-&amp;gt;schema });
+}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;With this as an entry point I can easily write a script which uses this class to access the full functionality of my app. I’ve also skipped a lot of coercing and auto-building in this example which you can use to make things even simpler.&lt;/p&gt;
+&lt;p&gt;ok, but I thought we were talking about Models?&lt;/p&gt;
+&lt;h3&gt;My App Model&lt;/h3&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;package My::Catalyst::Model::MyApp;
+use Moose;
+extends &amp;#39;Catalyst::Model::Factory::PerRequest&amp;#39;;
+
+__PACKAGE__-&amp;gt;config( class =&amp;gt; &amp;#39;My::App&amp;#39; );
+
+# Instantiate the main app for each request.
+sub prepare_arguments {
+    my ($self, $c) = @_;
+
+    my $args = $c-&amp;gt;config-&amp;gt;{&amp;#39;Model::MyApp&amp;#39;}{args};
+
+    $args-&amp;gt;{template} = $c-&amp;gt;view(&amp;#39;TT&amp;#39;)-&amp;gt;template;
+    $args-&amp;gt;{schema} = $c-&amp;gt;model(&amp;#39;DB&amp;#39;)-&amp;gt;schema;
+
+    $c-&amp;gt;session unless $c-&amp;gt;sessionid;
+
+    my $visitor = { session_id =&amp;gt; $c-&amp;gt;sessionid };
+    $visitor-&amp;gt;{user} = $c-&amp;gt;user if $c-&amp;gt;user_exists;
+
+    $args-&amp;gt;{visitor} = My::App::Visitor-&amp;gt;new($visitor);
+
+    return $args;
+}
+
+no Moose;
+__PACKAGE__-&amp;gt;meta-&amp;gt;make_immutable();
+
+1;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;With this model in my Catalyst app I can now access my main app from wherever I need within the Catalyst system via $c-&gt;model(‘MyApp’). I’m also reusing things that Catalyst makes simple like my database model and template object. I use the template object when creating system emails in my app and there’s no reason to instantiate a new Template object each time, and I can set it up once and know the same instance will be used everywhere.&lt;/p&gt;
+&lt;h3&gt;My Controller&lt;/h3&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;package My::Catalyst::Controller::Root;
+use Moose;
+use namespace::autoclean;
+
+BEGIN { extends &amp;#39;Catalyst::Controller&amp;#39; }
+
+__PACKAGE__-&amp;gt;config(namespace =&amp;gt; &amp;#39;&amp;#39;);
+
+sub index : Local{
+    my ( $self, $c ) = @_;
+
+    my $app = $c-&amp;gt;model(&amp;#39;MyApp&amp;#39;);
+
+    $c-&amp;gt;stash({
+        template =&amp;gt; &amp;#39;index.tt&amp;#39;,
+        latest_products =&amp;gt; $app-&amp;gt;products-&amp;gt;latest
+    });
+}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Now I can use Catalyst for all the wonderful things it makes so easy while keeping my main app nicely separated from it. Oh, and just quietly.. if the sky turned green and I needed to set up a quick Dancer or Mojolicious app I could do that quite easily too..&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;update: well, look at that sky.. 8) for my latest project, &lt;a href=&quot;https://pdfunicorn.com&quot;&gt;PDFUnicorn&lt;/a&gt; I’ve chosen to go with &lt;a href=&quot;http://mojolicio.us/&quot;&gt;Mojolicious&lt;/a&gt; for it’s non-blocking goodness. (interesting to note the similarities with the &lt;a href=&quot;http://expressjs.com/&quot;&gt;Express&lt;/a&gt; framework for &lt;a href=&quot;http://nodejs.org/&quot;&gt;Node.js&lt;/a&gt;, the current darling of modern web dev).&lt;/em&gt;&lt;/p&gt;</content:encoded></item></channel></rss>
