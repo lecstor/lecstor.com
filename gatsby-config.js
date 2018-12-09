@@ -3,7 +3,7 @@ module.exports = {
     title: "Lecstor's Blog",
     author: "Jason Galea",
     description: "Things I might want to know again later.",
-    siteUrl: "https://lecstor.com/",
+    siteUrl: "https://lecstor.com",
   },
   // pathPrefix: "/blog",
   plugins: [
@@ -18,6 +18,7 @@ module.exports = {
       resolve: `gatsby-transformer-remark`,
       options: {
         plugins: [
+          "gatsby-remark-autolink-headers",
           {
             resolve: `gatsby-remark-images`,
             options: {
@@ -65,5 +66,6 @@ module.exports = {
         pathToConfigModule: "src/utils/typography",
       },
     },
+    `gatsby-plugin-sitemap`,
   ],
 };
