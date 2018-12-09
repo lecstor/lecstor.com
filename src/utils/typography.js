@@ -1,5 +1,8 @@
 import Typography from "typography";
+import CodePlugin from "typography-plugin-code";
 import Github from "typography-theme-github";
+
+Github.plugins = [new CodePlugin()];
 
 // Github.overrideThemeStyles = () => ({
 //   "a.gatsby-resp-image-link": {
