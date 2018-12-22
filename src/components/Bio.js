@@ -37,7 +37,7 @@ class Bio extends React.Component {
             </a>{" "}
             on the{" "}
             <a href="https://app.safetyculture.io">SafetyCulture web app</a>,{" "}
-            with React & Nodem, backing the awsome{" "}
+            with React & Node, backing the awsome{" "}
             <a href="http://www.safetyculture.com.au/iAuditor/">iAuditor</a>{" "}
             mobile app for{" "}
             <a href="https://itunes.apple.com/au/app/iauditor-safety-audit-checklist/id499999532?mt=8">
