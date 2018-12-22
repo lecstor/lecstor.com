@@ -1,4 +1,75 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Lecstor's Blog]]></title><description><![CDATA[Things I might want to know again later.]]></description><link>https://lecstor.com</link><generator>RSS for Node</generator><lastBuildDate>Sun, 09 Dec 2018 22:35:10 GMT</lastBuildDate><item><title><![CDATA[Reusable React Components [WIP]]]></title><description><![CDATA[To make you components as reusable as possible you should keep them small and
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Lecstor's Blog]]></title><description><![CDATA[Things I might want to know again later.]]></description><link>https://lecstor.com</link><generator>RSS for Node</generator><lastBuildDate>Sat, 22 Dec 2018 01:56:14 GMT</lastBuildDate><item><title><![CDATA[React does not fire onMouseLeave events on a disabled button]]></title><description><![CDATA[Demo on CodeSandbox Posting as this was decently difficult to diagnose while researching and testing 3rd party popover/tooltip components…]]></description><link>https://lecstor.com/react-disabled-button-onmouseleave/</link><guid isPermaLink="false">https://lecstor.com/react-disabled-button-onmouseleave/</guid><pubDate>Sat, 22 Dec 2018 01:38:00 GMT</pubDate><content:encoded>&lt;p&gt;&lt;a href=&quot;https://codesandbox.io/s/8xlw160jl9&quot;&gt;Demo on CodeSandbox&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Posting as this was decently difficult to diagnose while researching and testing 3rd party popover/tooltip components.&lt;/p&gt;
+&lt;p&gt;The button component I needed an &lt;code class=&quot;language-text&quot;&gt;onHover&lt;/code&gt; tooltip for is responsive via either &lt;code class=&quot;language-text&quot;&gt;react-responsive&lt;/code&gt; or plain old media queries.&lt;/p&gt;
+&lt;p&gt;The responsive options were wrapped in a &lt;code class=&quot;language-text&quot;&gt;React.Fragment&lt;/code&gt; so there were also issues with the tooltip components augmenting the first option even when the second was displayed (unconfirmed if this was only with plain media queries).&lt;/p&gt;
+&lt;p&gt;Swapping &lt;code class=&quot;language-text&quot;&gt;React.Fragment&lt;/code&gt; for a plain &lt;code class=&quot;language-text&quot;&gt;div&lt;/code&gt; changed the results, but did not solve the problem, making the issue more difficult to debug.&lt;/p&gt;
+&lt;p&gt;In the end I think the best solution will be to simply fake the disabled state of the button instead of actually disabling the html element.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;References:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://codesandbox.io/s/yqnx763509&quot;&gt;Native button mouse eneter/leave&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/facebook/react/issues/10396&quot;&gt;onMouseLeave strange behaver when has disabled child element&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/facebook/react/issues/6807&quot;&gt;onMouseLeave doesn’t work if the node gets detached&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/facebook/react/issues/11972&quot;&gt;Consider removing mouseenter/mouseleave polyfill&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;import React from &amp;quot;react&amp;quot;;
+import ReactDOM from &amp;quot;react-dom&amp;quot;;
+
+function log(who) {
+  return () =&amp;gt; console.log(who);
+}
+
+function App() {
+  return (
+    &amp;lt;div className=&amp;quot;App&amp;quot;&amp;gt;
+      &amp;lt;h1&amp;gt;Hello Button&amp;lt;/h1&amp;gt;
+      &amp;lt;p&amp;gt;
+        React will not fire onMouseLeave events for a disabled button (although
+        it does fire onMouseEnter)
+      &amp;lt;/p&amp;gt;
+      &amp;lt;p&amp;gt;Open the CodeSandbox console to see logging&amp;lt;/p&amp;gt;
+      &amp;lt;div style={{ margin: &amp;quot;3rem&amp;quot; }}&amp;gt;
+        Works as intended{&amp;quot; &amp;quot;}
+        &amp;lt;button onMouseEnter={log(&amp;quot;enter&amp;quot;)} onMouseLeave={log(&amp;quot;leave&amp;quot;)}&amp;gt;
+          Button
+        &amp;lt;/button&amp;gt;
+      &amp;lt;/div&amp;gt;
+      &amp;lt;div style={{ margin: &amp;quot;3rem&amp;quot; }}&amp;gt;
+        No onMouseLeave{&amp;quot; &amp;quot;}
+        &amp;lt;button
+          disabled
+          onMouseEnter={log(&amp;quot;disabled enter&amp;quot;)}
+          onMouseLeave={log(&amp;quot;disabled leave&amp;quot;)}
+        &amp;gt;
+          Disabled Button
+        &amp;lt;/button&amp;gt;
+      &amp;lt;/div&amp;gt;
+      &amp;lt;div style={{ margin: &amp;quot;3rem&amp;quot; }}&amp;gt;
+        Events on parent div, works sometimes
+        &amp;lt;div
+          style={{ border: &amp;quot;1px solid blue&amp;quot; }}
+          onMouseEnter={log(&amp;quot;div enter&amp;quot;)}
+          onMouseLeave={log(&amp;quot;div leave&amp;quot;)}
+        &amp;gt;
+          &amp;lt;button disabled&amp;gt;Div&amp;#39;d Disabled Button&amp;lt;/button&amp;gt;
+        &amp;lt;/div&amp;gt;
+      &amp;lt;/div&amp;gt;
+      &amp;lt;div style={{ margin: &amp;quot;3rem&amp;quot; }}&amp;gt;
+        Events on parent div with padding, works more often (dependant on mouse
+        move speed)
+        &amp;lt;div
+          style={{ padding: &amp;quot;1px&amp;quot;, border: &amp;quot;1px solid blue&amp;quot; }}
+          onMouseEnter={log(&amp;quot;div 2 enter&amp;quot;)}
+          onMouseLeave={log(&amp;quot;div 2 leave&amp;quot;)}
+        &amp;gt;
+          &amp;lt;button disabled&amp;gt;Div&amp;#39;d Disabled Button 2&amp;lt;/button&amp;gt;
+        &amp;lt;/div&amp;gt;
+      &amp;lt;/div&amp;gt;
+    &amp;lt;/div&amp;gt;
+  );
+}
+
+const rootElement = document.getElementById(&amp;quot;root&amp;quot;);
+ReactDOM.render(&amp;lt;App /&amp;gt;, rootElement);&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content:encoded></item><item><title><![CDATA[Reusable React Components [WIP]]]></title><description><![CDATA[To make you components as reusable as possible you should keep them small and
 focussed. Much like functions, the single responsibility…]]></description><link>https://lecstor.com/reusable-react-components/</link><guid isPermaLink="false">https://lecstor.com/reusable-react-components/</guid><pubDate>Sun, 09 Dec 2018 11:42:00 GMT</pubDate><content:encoded>&lt;p&gt;To make you components as reusable as possible you should keep them small and
 focussed. Much like functions, the single responsibility principle is a good
 one to follow.&lt;/p&gt;
