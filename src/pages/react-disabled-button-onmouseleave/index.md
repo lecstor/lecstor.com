@@ -3,8 +3,6 @@ title: React does not fire onMouseLeave events on a disabled button
 date: "2018-12-22T01:38:00.000Z"
 ---
 
-[Demo on CodeSandbox](https://codesandbox.io/s/8xlw160jl9)
-
 Posting as this was decently difficult to diagnose while researching and testing 3rd party popover/tooltip components.
 
 The button component I needed an `onHover` tooltip for is responsive via either `react-responsive` or plain old media queries.
@@ -14,6 +12,8 @@ The responsive options were wrapped in a `React.Fragment` so there were also iss
 Swapping `React.Fragment` for a plain `div` changed the results, but did not solve the problem, making the issue more difficult to debug.
 
 In the end I think the best solution will be to simply fake the disabled state of the button instead of actually disabling the html element.
+
+[Demo on CodeSandbox](https://codesandbox.io/s/8xlw160jl9)
 
 **References:**
 
