@@ -3,6 +3,11 @@ title: Reusable React Components [WIP]
 date: "2018-12-09T11:42:00.000Z"
 ---
 
+Building a reusable component library for your app will speed up development,
+increase consistency of the UI, and reduce the total download size of your app.
+
+Below are a few tips I've picked up while building the web app for [SafetyCulture](https://safetyculture.com).
+
 - [Margins](#margins) - don't give components external margins, use layout components instead
 - [Unhandled Props](#unhandled-props) - pass unhandled props to the rendered element
 - [Component Composition](#component-composition)
@@ -16,7 +21,7 @@ Setting external margins on your component forces the user of the component to
 either accept, work around, or override those margins, especially when there
 are conflicting margins on adjacent elements.
 
-Wrapping components in simple divs with padding or margins will keep your
+Wrapping components in simple divs with padding (or margins) will keep your
 components more easily reusable. (see [Containers](#containers))
 
 ## Unhandled Props
@@ -53,9 +58,84 @@ export type ButtonProps = {
 
 Use the `children` prop or other props that take elements to be rendered.
 
+When this is a viable pattern it is the simplest way to allow maximum
+customisation of the rendered components.
+
 ```
 const Button1 = ({ ...props }) = <button {...props} />;
 const Button2 = ({ label, ...props }) = <button {...props}>{label}</button>;
+```
+
+### Render-props and Higher-order Components
+
+Component logic can be shared by many components by encapsulating it in it's
+own component. These components can be built as
+[Higher-order Components](https://reactjs.org/docs/higher-order-components.html)
+or utilise [render props](https://reactjs.org/docs/render-props.html).
+
+Higher-order components are functions that take a component and return a new
+component with enhanced capabilities.
+
+[HOC example on CodeSandbox](https://codesandbox.io/s/p58jr6wx7q)
+
+```
+function withYear(Component, message) {
+  return class extends React.Component {
+    render() {
+      const { children, ...props } = this.props;
+      return (
+        <Component {...props}>
+          {message} {new Date().getYear() + 1900}: {children}
+        </Component>
+      );
+    }
+  };
+}
+
+const Thing = props => <div {...props} />;
+
+const ThingWithYear = withYear(Thing, "from");
+```
+
+The render props pattern allows a component to accept one or more components as
+props to be rendered with customised props provided by the parent component.
+
+[Render props example on CodeSandbox](https://codesandbox.io/s/w73mzm72r8)
+
+```
+function WithYear({ component: Component, ...props }) {
+  const year = new Date().getYear() + 1900;
+  return <Component {...props} year={year} />;
+}
+
+const Thing = ({ message, year, children, ...props }) => (
+  <div {...props}>
+    {message} {year}: {children}
+  </div>
+);
+
+function App() {
+  return (
+    <div className="App">
+      <WithYear message="from" component={Thing}>
+        Hello CodeSandbox
+      </WithYear>
+    </div>
+  );
+}
+```
+
+For ultimate flexibility, a render-props component can be wrapped in a HOC
+allowing the provided functionality to be used in either way.
+
+[Render props and HOC example on CodeSandbox](https://codesandbox.io/s/6z99z1yz6z)
+
+```
+function withYear(Component, message) {
+  return props => (
+    <WithYear message={message} component={Component} {...props} />
+  );
+}
 ```
 
 ### Specialization
@@ -86,6 +166,9 @@ const LargePrimaryButton = (props) = {
   return <SizedModeButton large primary {...props} />;
 }
 ```
+
+When new functionality is then required, new components can be built using the
+simplest existing components that provide other required functionality.
 
 ## Containers
 
@@ -122,21 +205,3 @@ const InputContainer = ({ children, className, style }) => {
 
 export default InputContainer;
 ```
-
-## Render-props and Higher-order Components
-
-Component logic can be shared by many components by encapsulating it in it's
-own component. These components can be built as
-[Higher-order Components](https://reactjs.org/docs/higher-order-components.html)
-or utilise [render props](https://reactjs.org/docs/render-props.html).
-
-Higher-order components are functions that take a component and return a new
-component with enhanced capabilities and are applied to a single, complete
-components.
-
-The render props pattern allows a component to accept one or more components as
-props to be rendered with customised props provided by the parent component.
-
-For ultimate flexibility, depending on the use-case, a render-props component
-can be wrapped in a HOC allowing the provided functionality to be used in either
-way.
