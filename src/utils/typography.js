@@ -4,11 +4,11 @@ import Github from "typography-theme-github";
 
 Github.plugins = [new CodePlugin()];
 
-// Github.overrideThemeStyles = () => ({
-//   "a.gatsby-resp-image-link": {
-//     boxShadow: "none",
-//   },
-// });
+Github.overrideThemeStyles = () => ({
+  code: {
+    fontSize: "0.75rem",
+  },
+});
 
 delete Github.googleFonts;
 

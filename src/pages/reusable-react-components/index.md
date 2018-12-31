@@ -35,7 +35,7 @@ needed to add `onMouseEnter` & `onMouseLeave` handlers to my button.
 
 This is simple to implement using the ES6 `rest` operator, eg
 
-```
+```js
 const Button = ({ label, ...props }) = <button {...props}>{label}</button>;
 ```
 
@@ -46,7 +46,7 @@ accordingly to avoid TS errors when trying to apply unhandled props to the
 component. Refer to the source of `@types/react/index.d.ts` that you are
 using to see what's available.
 
-```
+```ts
 export type ButtonProps = {
   label: string;
 } & React.HTMLAttributes<HTMLButtonElement>;
@@ -61,7 +61,7 @@ Use the `children` prop or other props that take elements to be rendered.
 When this is a viable pattern it is the simplest way to allow maximum
 customisation of the rendered components.
 
-```
+```js
 const Button1 = ({ ...props }) = <button {...props} />;
 const Button2 = ({ label, ...props }) = <button {...props}>{label}</button>;
 ```
@@ -78,7 +78,7 @@ component with enhanced capabilities.
 
 [HOC example on CodeSandbox](https://codesandbox.io/s/p58jr6wx7q)
 
-```
+```js
 function withYear(Component, message) {
   return class extends React.Component {
     render() {
@@ -102,7 +102,7 @@ props to be rendered with customised props provided by the parent component.
 
 [Render props example on CodeSandbox](https://codesandbox.io/s/w73mzm72r8)
 
-```
+```js
 function WithYear({ component: Component, ...props }) {
   const year = new Date().getYear() + 1900;
   return <Component {...props} year={year} />;
@@ -130,7 +130,7 @@ allowing the provided functionality to be used in either way.
 
 [Render props and HOC example on CodeSandbox](https://codesandbox.io/s/6z99z1yz6z)
 
-```
+```js
 function withYear(Component, message) {
   return props => (
     <WithYear message={message} component={Component} {...props} />
@@ -143,7 +143,7 @@ function withYear(Component, message) {
 Start with a component that implements the simplest functionality you will need
 while ensuring that it is as customisable as possible.
 
-```
+```js
 const ModeButton = ({ primary, danger, style, ...props }) = {
   const backgroundColor = primary ? "blue" : danger ? "red" : "white";
   return (<button {...props} style={{ backgroundColor, ...style }} />);
@@ -152,7 +152,7 @@ const ModeButton = ({ primary, danger, style, ...props }) = {
 
 You can then create other components that add more functionality..
 
-```
+```js
 const SizedModeButton = ({ small, large, style, ...props }) = {
   const padding = small ? "0.5rem" : large ? "1rem" : "0.7rem";
   return <ModeButton primary {...props} style={{ ...style, padding }} />;
@@ -161,10 +161,10 @@ const SizedModeButton = ({ small, large, style, ...props }) = {
 
 ..or configure those components for specific use cases.
 
-```
-const LargePrimaryButton = (props) = {
-  return <SizedModeButton large primary {...props} />;
-}
+```js
+const LargePrimaryButton = (props = (
+  <SizedModeButton large primary {...props} />
+));
 ```
 
 When new functionality is then required, new components can be built using the
@@ -184,7 +184,7 @@ By setting default styles on a container component, but also allowing
 `className` and `style` props to be specified, your container components will
 be simple to use and tweak.
 
-```javascript
+```js
 import styled from "styled-components";
 
 const Box = styled.div`
@@ -197,11 +197,11 @@ const Box = styled.div`
   }
 `;
 
-const InputContainer = ({ children, className, style }) => {
+const InputContainer = ({ children, className, style }) => (
   <Box className={className} style={style}>
     {children}
-  </Box>;
-};
+  </Box>
+);
 
 export default InputContainer;
 ```
