@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Lecstor's Blog]]></title><description><![CDATA[Things I might want to know again later.]]></description><link>https://lecstor.com</link><generator>RSS for Node</generator><lastBuildDate>Sun, 30 Dec 2018 12:42:06 GMT</lastBuildDate><item><title><![CDATA[React does not fire onMouseLeave events on a disabled button]]></title><description><![CDATA[Posting as this was decently difficult to diagnose while researching and testing 3rd party popover/tooltip components. The button component…]]></description><link>https://lecstor.com/react-disabled-button-onmouseleave/</link><guid isPermaLink="false">https://lecstor.com/react-disabled-button-onmouseleave/</guid><pubDate>Sat, 22 Dec 2018 01:38:00 GMT</pubDate><content:encoded>&lt;p&gt;Posting as this was decently difficult to diagnose while researching and testing 3rd party popover/tooltip components.&lt;/p&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Lecstor's Blog]]></title><description><![CDATA[Things I might want to know again later.]]></description><link>https://lecstor.com</link><generator>RSS for Node</generator><lastBuildDate>Mon, 31 Dec 2018 05:03:52 GMT</lastBuildDate><item><title><![CDATA[React does not fire onMouseLeave events on a disabled button]]></title><description><![CDATA[Posting as this was decently difficult to diagnose while researching and testing 3rd party popover/tooltip components. The button component…]]></description><link>https://lecstor.com/react-disabled-button-onmouseleave/</link><guid isPermaLink="false">https://lecstor.com/react-disabled-button-onmouseleave/</guid><pubDate>Sat, 22 Dec 2018 01:38:00 GMT</pubDate><content:encoded>&lt;p&gt;Posting as this was decently difficult to diagnose while researching and testing 3rd party popover/tooltip components.&lt;/p&gt;
 &lt;p&gt;The button component I needed an &lt;code class=&quot;language-text&quot;&gt;onHover&lt;/code&gt; tooltip for is responsive via either &lt;code class=&quot;language-text&quot;&gt;react-responsive&lt;/code&gt; or plain old media queries.&lt;/p&gt;
 &lt;p&gt;The responsive options were wrapped in a &lt;code class=&quot;language-text&quot;&gt;React.Fragment&lt;/code&gt; so there were also issues with the tooltip components augmenting the first option even when the second was displayed (unconfirmed if this was only with plain media queries).&lt;/p&gt;
 &lt;p&gt;Swapping &lt;code class=&quot;language-text&quot;&gt;React.Fragment&lt;/code&gt; for a plain &lt;code class=&quot;language-text&quot;&gt;div&lt;/code&gt; changed the results, but did not solve the problem, making the issue more difficult to debug.&lt;/p&gt;
@@ -69,7 +69,11 @@ function App() {
 }
 
 const rootElement = document.getElementById(&amp;quot;root&amp;quot;);
-ReactDOM.render(&amp;lt;App /&amp;gt;, rootElement);&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content:encoded></item><item><title><![CDATA[Reusable React Components [WIP]]]></title><description><![CDATA[Margins  - don’t give components external margins, use layout components instead Unhandled Props  - pass unhandled props to the rendered…]]></description><link>https://lecstor.com/reusable-react-components/</link><guid isPermaLink="false">https://lecstor.com/reusable-react-components/</guid><pubDate>Sun, 09 Dec 2018 11:42:00 GMT</pubDate><content:encoded>&lt;ul&gt;
+ReactDOM.render(&amp;lt;App /&amp;gt;, rootElement);&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content:encoded></item><item><title><![CDATA[Reusable React Components [WIP]]]></title><description><![CDATA[Building a reusable component library for your app will speed up development,
+increase consistency of the UI, and reduce the total download…]]></description><link>https://lecstor.com/reusable-react-components/</link><guid isPermaLink="false">https://lecstor.com/reusable-react-components/</guid><pubDate>Sun, 09 Dec 2018 11:42:00 GMT</pubDate><content:encoded>&lt;p&gt;Building a reusable component library for your app will speed up development,
+increase consistency of the UI, and reduce the total download size of your app.&lt;/p&gt;
+&lt;p&gt;Below are a few tips I’ve picked up while building the web app for &lt;a href=&quot;https://safetyculture.com&quot;&gt;SafetyCulture&lt;/a&gt;.&lt;/p&gt;
+&lt;ul&gt;
 &lt;li&gt;&lt;a href=&quot;#margins&quot;&gt;Margins&lt;/a&gt; - don’t give components external margins, use layout components instead&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#unhandled-props&quot;&gt;Unhandled Props&lt;/a&gt; - pass unhandled props to the rendered element&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#component-composition&quot;&gt;Component Composition&lt;/a&gt;&lt;/li&gt;
@@ -80,7 +84,7 @@ ReactDOM.render(&amp;lt;App /&amp;gt;, rootElement);&lt;/code&gt;&lt;/pre&gt;&lt
 &lt;p&gt;Setting external margins on your component forces the user of the component to
 either accept, work around, or override those margins, especially when there
 are conflicting margins on adjacent elements.&lt;/p&gt;
-&lt;p&gt;Wrapping components in simple divs with padding or margins will keep your
+&lt;p&gt;Wrapping components in simple divs with padding (or margins) will keep your
 components more easily reusable. (see &lt;a href=&quot;#containers&quot;&gt;Containers&lt;/a&gt;)&lt;/p&gt;
 &lt;h2 id=&quot;unhandled-props&quot;&gt;&lt;a href=&quot;#unhandled-props&quot; aria-hidden class=&quot;anchor&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Unhandled Props&lt;/h2&gt;
 &lt;p&gt;Passing unhandled props to the rendered element will allow it to be styled via
@@ -101,8 +105,65 @@ using to see what’s available.&lt;/p&gt;
 &lt;h2 id=&quot;component-composition&quot;&gt;&lt;a href=&quot;#component-composition&quot; aria-hidden class=&quot;anchor&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Component Composition&lt;/h2&gt;
 &lt;h3 id=&quot;elements-as-props&quot;&gt;&lt;a href=&quot;#elements-as-props&quot; aria-hidden class=&quot;anchor&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Elements as props&lt;/h3&gt;
 &lt;p&gt;Use the &lt;code class=&quot;language-text&quot;&gt;children&lt;/code&gt; prop or other props that take elements to be rendered.&lt;/p&gt;
+&lt;p&gt;When this is a viable pattern it is the simplest way to allow maximum
+customisation of the rendered components.&lt;/p&gt;
 &lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;const Button1 = ({ ...props }) = &amp;lt;button {...props} /&amp;gt;;
 const Button2 = ({ label, ...props }) = &amp;lt;button {...props}&amp;gt;{label}&amp;lt;/button&amp;gt;;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3 id=&quot;render-props-and-higher-order-components&quot;&gt;&lt;a href=&quot;#render-props-and-higher-order-components&quot; aria-hidden class=&quot;anchor&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Render-props and Higher-order Components&lt;/h3&gt;
+&lt;p&gt;Component logic can be shared by many components by encapsulating it in it’s
+own component. These components can be built as
+&lt;a href=&quot;https://reactjs.org/docs/higher-order-components.html&quot;&gt;Higher-order Components&lt;/a&gt;
+or utilise &lt;a href=&quot;https://reactjs.org/docs/render-props.html&quot;&gt;render props&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Higher-order components are functions that take a component and return a new
+component with enhanced capabilities.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://codesandbox.io/s/p58jr6wx7q&quot;&gt;HOC example on CodeSandbox&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;function withYear(Component, message) {
+  return class extends React.Component {
+    render() {
+      const { children, ...props } = this.props;
+      return (
+        &amp;lt;Component {...props}&amp;gt;
+          {message} {new Date().getYear() + 1900}: {children}
+        &amp;lt;/Component&amp;gt;
+      );
+    }
+  };
+}
+
+const Thing = props =&amp;gt; &amp;lt;div {...props} /&amp;gt;;
+
+const ThingWithYear = withYear(Thing, &amp;quot;from&amp;quot;);&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The render props pattern allows a component to accept one or more components as
+props to be rendered with customised props provided by the parent component.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://codesandbox.io/s/w73mzm72r8&quot;&gt;Render props example on CodeSandbox&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;function WithYear({ component: Component, ...props }) {
+  const year = new Date().getYear() + 1900;
+  return &amp;lt;Component {...props} year={year} /&amp;gt;;
+}
+
+const Thing = ({ message, year, children, ...props }) =&amp;gt; (
+  &amp;lt;div {...props}&amp;gt;
+    {message} {year}: {children}
+  &amp;lt;/div&amp;gt;
+);
+
+function App() {
+  return (
+    &amp;lt;div className=&amp;quot;App&amp;quot;&amp;gt;
+      &amp;lt;WithYear message=&amp;quot;from&amp;quot; component={Thing}&amp;gt;
+        Hello CodeSandbox
+      &amp;lt;/WithYear&amp;gt;
+    &amp;lt;/div&amp;gt;
+  );
+}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;For ultimate flexibility, a render-props component can be wrapped in a HOC
+allowing the provided functionality to be used in either way.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://codesandbox.io/s/6z99z1yz6z&quot;&gt;Render props and HOC example on CodeSandbox&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;function withYear(Component, message) {
+  return props =&amp;gt; (
+    &amp;lt;WithYear message={message} component={Component} {...props} /&amp;gt;
+  );
+}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;h3 id=&quot;specialization&quot;&gt;&lt;a href=&quot;#specialization&quot; aria-hidden class=&quot;anchor&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Specialization&lt;/h3&gt;
 &lt;p&gt;Start with a component that implements the simplest functionality you will need
 while ensuring that it is as customisable as possible.&lt;/p&gt;
@@ -119,6 +180,8 @@ while ensuring that it is as customisable as possible.&lt;/p&gt;
 &lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;const LargePrimaryButton = (props) = {
   return &amp;lt;SizedModeButton large primary {...props} /&amp;gt;;
 }&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;When new functionality is then required, new components can be built using the
+simplest existing components that provide other required functionality.&lt;/p&gt;
 &lt;h2 id=&quot;containers&quot;&gt;&lt;a href=&quot;#containers&quot; aria-hidden class=&quot;anchor&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Containers&lt;/h2&gt;
 &lt;p&gt;Container components are great because they are very easy to make completely
 customisable, though naming is hard and and deciding when to customise and when
@@ -147,20 +210,7 @@ be simple to use and tweak.&lt;/p&gt;
   &lt;span class=&quot;token operator&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;/&lt;/span&gt;Box&lt;span class=&quot;token operator&quot;&gt;&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
 
-&lt;span class=&quot;token keyword&quot;&gt;export&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;default&lt;/span&gt; InputContainer&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h2 id=&quot;render-props-and-higher-order-components&quot;&gt;&lt;a href=&quot;#render-props-and-higher-order-components&quot; aria-hidden class=&quot;anchor&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Render-props and Higher-order Components&lt;/h2&gt;
-&lt;p&gt;Component logic can be shared by many components by encapsulating it in it’s
-own component. These components can be built as
-&lt;a href=&quot;https://reactjs.org/docs/higher-order-components.html&quot;&gt;Higher-order Components&lt;/a&gt;
-or utilise &lt;a href=&quot;https://reactjs.org/docs/render-props.html&quot;&gt;render props&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Higher-order components are functions that take a component and return a new
-component with enhanced capabilities and are applied to a single, complete
-components.&lt;/p&gt;
-&lt;p&gt;The render props pattern allows a component to accept one or more components as
-props to be rendered with customised props provided by the parent component.&lt;/p&gt;
-&lt;p&gt;For ultimate flexibility, depending on the use-case, a render-props component
-can be wrapped in a HOC allowing the provided functionality to be used in either
-way.&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Building a PDF writer]]></title><description><![CDATA[A PDF file is basically a set of object serialised in a specific format similar to PostScript. Our initial goal is to be able to place text…]]></description><link>https://lecstor.com/building-a-pdf-writer/</link><guid isPermaLink="false">https://lecstor.com/building-a-pdf-writer/</guid><pubDate>Fri, 10 Feb 2017 03:49:00 GMT</pubDate><content:encoded>&lt;p&gt;A PDF file is basically a set of object serialised in a specific format similar to PostScript. Our initial goal is to be able to place text in a PDF by writing the required objects in the correct format but today we’ll just start with the overall layout of the PDF file source.&lt;/p&gt;
+&lt;span class=&quot;token keyword&quot;&gt;export&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;default&lt;/span&gt; InputContainer&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content:encoded></item><item><title><![CDATA[Building a PDF writer]]></title><description><![CDATA[A PDF file is basically a set of object serialised in a specific format similar to PostScript. Our initial goal is to be able to place text…]]></description><link>https://lecstor.com/building-a-pdf-writer/</link><guid isPermaLink="false">https://lecstor.com/building-a-pdf-writer/</guid><pubDate>Fri, 10 Feb 2017 03:49:00 GMT</pubDate><content:encoded>&lt;p&gt;A PDF file is basically a set of object serialised in a specific format similar to PostScript. Our initial goal is to be able to place text in a PDF by writing the required objects in the correct format but today we’ll just start with the overall layout of the PDF file source.&lt;/p&gt;
 &lt;p&gt;The first thing we write to the file is the PDF header which consists of the PDF version and 4 binary characters to ensure readers know the file contains binary.&lt;/p&gt;
 &lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;%PDF-1.4
 %ÿÿÿÿ&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
