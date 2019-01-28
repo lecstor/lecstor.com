@@ -3,6 +3,9 @@ title: Golang Cheatsheet
 date: "2019-01-27T23:41:17Z"
 ---
 
+Learning Go, so started recording references to all the useful things I find so
+I can find them again when I need them..
+
 # Install
 
 ```bash
