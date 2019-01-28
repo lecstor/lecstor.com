@@ -1,5 +1,5 @@
 ---
-title: Golang (gO) Cheatsheet
+title: Golang Cheatsheet
 date: "2019-01-27T23:41:17Z"
 ---
 
