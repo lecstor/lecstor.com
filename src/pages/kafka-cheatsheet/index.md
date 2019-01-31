@@ -76,6 +76,8 @@ $ kafkacat -C -b localhost:9092 -t awesome-topic -o 201 -D "" -e | protoc --deco
 
 ## decode specifc Types of protobuf messages and dump pretty values
 
+(bugga, it only dumps the last mesage..)
+
 ```bash
 $ kafkacat -C -b localhost -t awesome-topic -D "" -e | protoc --decode=my.message.Type \
 --proto_path=./path/to/proto/files My.proto
