@@ -63,6 +63,8 @@ option to get kafkacat to exit before protoc would dump the messages.
 This means that you don't get the desired tail/follow functionality but it's still
 usable enough with a little extra effort to set the offset.
 
+## decode any Type of protobuf message and dump raw values
+
 ```bash
 $ kafkacat -C -b localhost:9092 -t awesome-topic -o beginning -D "" -e | protoc --decode_raw
 % Reached end of topic awesome-topic [0] at offset 201: exiting
@@ -70,4 +72,11 @@ $ kafkacat -C -b localhost:9092 -t awesome-topic -o beginning -D "" -e | protoc 
 $ kafkacat -C -b localhost:9092 -t awesome-topic -o 201 -D "" -e | protoc --decode_raw
 % Reached end of topic awesome-topic [0] at offset 321: exiting
 ...new messages...
+```
+
+## decode specifc Types of protobuf messages and dump pretty values
+
+```bash
+$ kafkacat -C -b localhost -t awesome-topic -D "" -e | protoc --decode=my.message.Type \
+--proto_path=./path/to/proto/files My.proto
 ```
