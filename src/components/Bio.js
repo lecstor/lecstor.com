@@ -31,43 +31,14 @@ class Bio extends React.Component {
             Written by <strong>Jason Galea</strong> from Cairns, Australia.
           </p>
           <p>
-            I work at{" "}
-            <a href="https://safetyculture.com" target="_blank">
-              SafetyCulture
-            </a>{" "}
-            on the{" "}
-            <a href="https://app.safetyculture.io">SafetyCulture web app</a>,{" "}
-            with React & Node, backing the awsome{" "}
-            <a href="http://www.safetyculture.com.au/iAuditor/">iAuditor</a>{" "}
-            mobile app for{" "}
-            <a href="https://itunes.apple.com/au/app/iauditor-safety-audit-checklist/id499999532?mt=8">
-              iOS
-            </a>{" "}
-            and{" "}
-            <a href="https://play.google.com/store/apps/details?id=com.safetyculture.iauditor&hl=en">
-              Android
-            </a>
-            .<br />
+            Senior Software Engineer looking for the next big challenge.<br />
+            Full Stack developer specialising in React and NodeJS.
           </p>
-          {/* <p>
-            <h5>Previously..</h5>
-            <ul>
-              <li>
-                1999 - Built and developed the{" "}
-                <a href="http://www.ezydvd.com.au">EzyDVD</a> web site over 12
-                years with 10,000 visitors a day and $25,000,000 in sales per
-                year.
-              </li>
-              <li>
-                1997 - Rebuit the{" "}
-                <a href="http://www.afc.com.au">Adelaide Crows</a> web site with
-                e-commerce, message board, and footy tipping competition.
-              </li>
-            </ul>
-          </p> */}
           <p>
-            <a href="https://twitter.com/lecstor">Twitter</a> |{" "}
-            <a href="https://github.com/lecstor">Github</a>
+            <a href="https://www.linkedin.com/in/jasongalea/">LinkedIn</a> |{" "}
+            <a href="https://github.com/lecstor">Github</a> |{" "}
+            <a href="https://stackoverflow.com/users/1315176/lecstor">StackOverflow</a> |{" "}
+            <a href="https://twitter.com/lecstor">Twitter</a>
           </p>
         </div>
       </div>
