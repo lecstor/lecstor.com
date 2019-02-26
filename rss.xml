@@ -1,4 +1,59 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Lecstor's Blog]]></title><description><![CDATA[Things I might want to know again later.]]></description><link>https://lecstor.com</link><generator>RSS for Node</generator><lastBuildDate>Tue, 19 Feb 2019 00:48:38 GMT</lastBuildDate><item><title><![CDATA[Kafka/Protobuf Cheatsheet]]></title><description><![CDATA[Tools for working with Kafka and Protobufs - all about dumping messages to the
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Lecstor's Blog]]></title><description><![CDATA[Things I might want to know again later.]]></description><link>https://lecstor.com</link><generator>RSS for Node</generator><lastBuildDate>Tue, 26 Feb 2019 01:17:08 GMT</lastBuildDate><item><title><![CDATA[A Journey from Google Cloud Functions to Appengine Flex]]></title><description><![CDATA[My goal was to deploy a basic React app with a server backend to the Google
+Cloud Platform. For learnings I decided to use Google Cloud…]]></description><link>https://lecstor.com/gcf-to-appengine/</link><guid isPermaLink="false">https://lecstor.com/gcf-to-appengine/</guid><pubDate>Invalid Date</pubDate><content:encoded>&lt;p&gt;My goal was to deploy a basic React app with a server backend to the Google
+Cloud Platform.&lt;/p&gt;
+&lt;p&gt;For learnings I decided to use Google Cloud Functions (which may also have been
+the cheapest backend option).&lt;/p&gt;
+&lt;p&gt;TL;DR this is not what Google Cloud Functions are intended for..&lt;/p&gt;
+&lt;h3 id=&quot;deploy-the-static-react-app&quot;&gt;&lt;a href=&quot;#deploy-the-static-react-app&quot; aria-hidden class=&quot;anchor&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Deploy the static React app&lt;/h3&gt;
+&lt;p&gt;The recommended option is to host this in Google Cloud Storage as Browser
+storage which gives the added benefit of being able to use a CDN with a click
+on a checkbox.&lt;/p&gt;
+&lt;p&gt;This was a fairly painless process involving creating the bucket named after my
+domain name and creating a CNAME record pointing to it. Unfortunately this
+doesn’t provide SSL.&lt;/p&gt;
+&lt;h3 id=&quot;set-up-a-load-balancer&quot;&gt;&lt;a href=&quot;#set-up-a-load-balancer&quot; aria-hidden class=&quot;anchor&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Set up a load balancer&lt;/h3&gt;
+&lt;p&gt;A bit more finding my way around, but not too bad using the great documentation
+available. The load balancer allowed me to add my domain and automatically add
+a Let’s Encrypt SSL cert.&lt;/p&gt;
+&lt;p&gt;With only an HTTPS endpoint set up, HTTP requests were denied so I added an HTTP
+endpoint. There’s currently no way to have the load balancer redirect from HTTP
+to HTTPS so I had to resort to adding a Javascript redirect snippet to my app
+index.html to ensure HTTPS was always used.&lt;/p&gt;
+&lt;p&gt;The load balancer can be set up to forward to a bucket backend, or a service
+backend, but not Google Cloud functions. I had the choice of adding a service
+and setting up a proxy, or having my app to hit the cloud functions directly 8(.
+I opted for the latter for the reduced cost and complexity.&lt;/p&gt;
+&lt;h3 id=&quot;move-to-appengine-flexible&quot;&gt;&lt;a href=&quot;#move-to-appengine-flexible&quot; aria-hidden class=&quot;anchor&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Move to Appengine Flexible&lt;/h3&gt;
+&lt;p&gt;At this point I reassessed things.. I had had thoughts of using websockets for
+live updates on database changes and realised that that was never going to work
+with GCF. I could add a service behind the load balancer and use it for
+websockets and at the same time solve the functions issue but then there didn’t
+seem to be enough benefit from maintaining the cloud functions as well as a
+service so I opted to move everything to a service. Putting that service behind
+the load balancer would then mean I would need to handle any scaling issues
+myself.&lt;/p&gt;
+&lt;p&gt;Appengine standard would potentially mean the service dissappeared at times,
+breaking the websockets implementation so I opted for flexible. I could start
+with a single service and easily increase that if ever needed.&lt;/p&gt;
+&lt;p&gt;Unfortunately Appengine can’t be set up to serve static content from GCS without
+going through the service, so the service will be serving both static and dynamic
+content and I lose the CDN. On the plus side it’ll all be there if I ever decide
+server-side rendering is the way to go..&lt;/p&gt;
+&lt;h3 id=&quot;summary&quot;&gt;&lt;a href=&quot;#summary&quot; aria-hidden class=&quot;anchor&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Summary&lt;/h3&gt;
+&lt;p&gt;The Google Cloud Platform is very well documented, and there are many tutorials
+available making it fairly easy to get things set up, as long as you follow the
+prescribed paths.&lt;/p&gt;
+&lt;p&gt;I was surprised and disappointed by some of the limitations imposed such as the
+lack of redirection from HTTP to HTTPS and the inability of the load balancers
+to forward to cloud functions in one instance and cloud storage in the other.
+The lack of HTTP/HTTPS redirection has an issue in the google bug tracker where
+a fix was promised a few years ago.&lt;/p&gt;
+&lt;p&gt;Ultimately I think the UI and documentation provided by Google is a refreshing
+change to that offered by AWS. It’s still relatively young as a platform so it’s
+likely that things will continue to improve. Hopefully the limitations are not
+concious decisions to push people to use the more vendor specific services such
+as Firebase. Appengine itself has definitely come a long way since I last used
+it 7 years ago.&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Kafka/Protobuf Cheatsheet]]></title><description><![CDATA[Tools for working with Kafka and Protobufs - all about dumping messages to the
 console at this point. Kafkacat https://medium.com…]]></description><link>https://lecstor.com/kafka-cheatsheet/</link><guid isPermaLink="false">https://lecstor.com/kafka-cheatsheet/</guid><pubDate>Wed, 30 Jan 2019 01:47:54 GMT</pubDate><content:encoded>&lt;p&gt;Tools for working with Kafka and Protobufs - all about dumping messages to the
 console at this point.&lt;/p&gt;
 &lt;h1 id=&quot;kafkacat&quot;&gt;&lt;a href=&quot;#kafkacat&quot; aria-hidden class=&quot;anchor&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Kafkacat&lt;/h1&gt;
@@ -226,7 +281,9 @@ using to see what’s available.&lt;/p&gt;
 &lt;h2 id=&quot;refs&quot;&gt;&lt;a href=&quot;#refs&quot; aria-hidden class=&quot;anchor&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Refs&lt;/h2&gt;
 &lt;p&gt;&lt;a href=&quot;https://twitter.com/ryanflorence/status/1090360880305340416&quot;&gt;https://twitter.com/ryanflorence/status/1090360880305340416&lt;/a&gt;&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt;If you publish a component to npm that wraps a dom element (like buttons or anchors, etc.), you need to use React.forwardRef, and forward the dom ref so that tools like @reach/menu-button, that manage focus, can compose with it.&lt;/p&gt;
+&lt;p&gt;If you publish a component to npm that wraps a dom element (like buttons or
+anchors, etc.), you need to use React.forwardRef, and forward the dom ref so
+that tools like @reach/menu-button, that manage focus, can compose with it.&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;h2 id=&quot;component-composition&quot;&gt;&lt;a href=&quot;#component-composition&quot; aria-hidden class=&quot;anchor&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Component Composition&lt;/h2&gt;
 &lt;h3 id=&quot;elements-as-props&quot;&gt;&lt;a href=&quot;#elements-as-props&quot; aria-hidden class=&quot;anchor&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Elements as props&lt;/h3&gt;
