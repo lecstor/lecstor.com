@@ -52,6 +52,14 @@ export type ButtonProps = {
 } & React.HTMLAttributes<HTMLButtonElement>;
 ```
 
+## Refs
+
+https://twitter.com/ryanflorence/status/1090360880305340416
+
+> If you publish a component to npm that wraps a dom element (like buttons or
+anchors, etc.), you need to use React.forwardRef, and forward the dom ref so
+that tools like @reach/menu-button, that manage focus, can compose with it.
+
 ## Component Composition
 
 ### Elements as props
