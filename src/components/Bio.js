@@ -31,7 +31,6 @@ class Bio extends React.Component {
             Written by <strong>Jason Galea</strong> from Cairns, Australia.
           </p>
           <p>
-            Senior Software Engineer looking for the next big challenge.<br />
             Full Stack developer specialising in React and NodeJS.
           </p>
           <p>
