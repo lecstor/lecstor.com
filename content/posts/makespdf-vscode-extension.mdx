@@ -1,0 +1,24 @@
+---
+title: "A VS Code extension for makesPDF"
+date: "2026-04-25"
+slug: "makespdf-vscode-extension"
+description: "A small VS Code extension that turns the Markdown file you're currently editing into a PDF, without leaving the editor."
+tags: ["makespdf", "vscode", "tools"]
+draft: false
+canonical: "https://blog.makespdf.com/makespdf-vscode-extension"
+---
+There's now a VS Code extension for makesPDF. Open a Markdown file, hit the command, get a PDF back in the editor. It's the shortest path from "I have notes in Markdown" to "I have a nicely typeset PDF" that I've managed to build so far.
+
+The [four-post series](/four-goes-at-the-same-idea) covered the history and the architecture behind makesPDF. This is a short note about a new front door into it.
+
+## What it does
+
+The extension adds a **Convert Markdown to PDF** command, an icon in the editor title bar, and a right-click entry in the context menu. Any of the three takes the current `.md` file, posts it to the makesPDF API, and opens the resulting PDF. That's the whole feature. It uses the same rendering pipeline as the web app and the API — sub-second for typical documents, no headless browser involved.
+
+## Who it's for
+
+Anyone who writes Markdown in VS Code and occasionally needs a PDF out the other end. Meeting notes that need to be shared with someone who wants a PDF attachment. READMEs you want to hand to a non-technical stakeholder. Drafts you'd like to review on paper. If you already live in the editor, the round-trip through a separate tool is friction you don't need.
+
+## Installing it
+
+Grab it from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Lecstor.makespdf-vscode-plugin). You'll need a makesPDF API key — create one in [Settings → API keys](https://makespdf.com/settings/api-keys) and paste it into the extension's settings. After that, open a Markdown file and run *Convert Markdown to PDF* from the command palette. If there's something specific you'd like it to do that it doesn't, let me know — it's a small surface and easy to add to.
