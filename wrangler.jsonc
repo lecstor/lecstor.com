@@ -6,7 +6,12 @@
   "main": "@tanstack/react-start/server-entry",
   "observability": {
     "enabled": true
-  }
+  },
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "lecstor.com", "custom_domain": true },
+    { "pattern": "www.lecstor.com", "custom_domain": true }
+  ]
   // D1 binding will be added once the DB is created:
   // "d1_databases": [
   //   {
