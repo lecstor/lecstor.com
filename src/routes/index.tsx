@@ -2,8 +2,11 @@ import * as stylex from '@stylexjs/stylex'
 import { createFileRoute } from '@tanstack/react-router'
 import { Bio } from '../components/Bio'
 import { PostList } from '../components/PostList'
+import { TagCloud } from '../components/TagCloud'
 import { posts } from '../lib/posts'
 import { colors, space, text } from '../styles/tokens.stylex'
+
+const SIDEBAR_BREAKPOINT = '@media (min-width: 48rem)'
 
 const styles = stylex.create({
   bioSpacer: { marginBottom: space.xl },
@@ -25,6 +28,19 @@ const styles = stylex.create({
   },
   promoBody: { margin: 0 },
   link: { color: colors.link },
+  layout: {
+    display: 'flex',
+    flexDirection: { default: 'column', [SIDEBAR_BREAKPOINT]: 'row' },
+    gap: space.xl,
+    alignItems: 'flex-start',
+  },
+  main: { flex: 1, minWidth: 0 },
+  sidebar: {
+    flexShrink: 0,
+    width: { default: '100%', [SIDEBAR_BREAKPOINT]: '11rem' },
+    position: { default: 'static', [SIDEBAR_BREAKPOINT]: 'sticky' },
+    top: space.lg,
+  },
 })
 
 export const Route = createFileRoute('/')({
@@ -46,7 +62,14 @@ function Home() {
           <a href="https://makespdf.com" {...stylex.props(styles.link)}>Take a look →</a>
         </p>
       </aside>
-      <PostList posts={posts} />
+      <div {...stylex.props(styles.layout)}>
+        <div {...stylex.props(styles.main)}>
+          <PostList posts={posts} />
+        </div>
+        <aside {...stylex.props(styles.sidebar)}>
+          <TagCloud />
+        </aside>
+      </div>
     </>
   )
 }
