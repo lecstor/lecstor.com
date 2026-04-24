@@ -36,5 +36,5 @@ export const text = stylex.defineVars({
 })
 
 export const layout = stylex.defineVars({
-  maxWidth: '42rem',
+  maxWidth: '52rem',
 })
