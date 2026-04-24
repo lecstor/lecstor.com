@@ -54,7 +54,7 @@ function PostPage() {
       <div {...stylex.props(styles.body)}>
         <MDXContent post={post} />
       </div>
-      <Bio />
+      <Bio variant="footer" />
     </article>
   )
 }
