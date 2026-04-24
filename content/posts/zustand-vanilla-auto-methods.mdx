@@ -1,0 +1,28 @@
+---
+title: "Vanilla Zustand in hook with auto-methods"
+date: "2022-01-27T22:54:00.000Z"
+slug: "zustand-vanilla-auto-methods"
+tags: []
+draft: false
+---
+
+> Zustand core can be imported and used without the React dependency. The only difference is that the create function does not return a hook, but the API utilities.
+https://github.com/pmndrs/zustand#using-zustand-without-react
+
+```
+import { createStore } from 'zustand/vanilla';
+
+const store = createStore(() => ({ ... }));
+const { getState, setState, subscribe } = store;
+
+export default store;
+```
+
+> You can use a vanilla store with useStore hook available since v4.
+
+```
+import { useStore } from 'zustand'
+import { vanillaStore } from './vanillaStore'
+
+const useBoundStore = (selector) => useStore(vanillaStore, selector)
+```
