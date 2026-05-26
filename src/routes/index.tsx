@@ -54,11 +54,20 @@ function Home() {
         <Bio />
       </div>
       <aside {...stylex.props(styles.promo)}>
-        <p {...stylex.props(styles.promoHeading)}>I'm building makesPDF</p>
+        <p {...stylex.props(styles.promoHeading)}>I'm building EzyApp</p>
         <p {...stylex.props(styles.promoBody)}>
-          An AI-native PDF generator that runs on Cloudflare Workers — sub-second renders, no
-          headless browser, no eval. Give it a sample document and it writes the template for
-          you.{' '}
+          A web app builder where the AI writes the app. You describe what you want, the AI
+          produces a small DSL, EzyApp runs it on Cloudflare and serves it on its own
+          subdomain (its own database, its own auth, fully isolated from every other app).{' '}
+          <a href="https://ezyapp.com" {...stylex.props(styles.link)}>Take a look →</a>
+        </p>
+      </aside>
+      <aside {...stylex.props(styles.promo)}>
+        <p {...stylex.props(styles.promoHeading)}>And still tending makesPDF</p>
+        <p {...stylex.props(styles.promoBody)}>
+          Now that the dust has settled on makesPDF, I've started another project. It's still
+          running.. an HTTP API that turns Markdown or a small JavaScript DSL into a PDF in
+          well under a second, no browser involved.{' '}
           <a href="https://makespdf.com" {...stylex.props(styles.link)}>Take a look →</a>
         </p>
       </aside>

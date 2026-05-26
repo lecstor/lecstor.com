@@ -7,7 +7,7 @@ tags: ["architecture", "runtime", "technical"]
 draft: false
 canonical: "https://blog.makespdf.com/sub-second-no-eval-no-browser"
 ---
-**Takeaway:** Running a PDF engine inside a single Cloudflare Worker request means giving up a lot of things you'd normally reach for — `eval`, headless Chromium, Node's filesystem, most of the npm ecosystem that assumes any of those exist. The payoff is sub-second renders for typical documents — no browser boot, no cold-start penalty — and hosting costs that round to zero at idle. This post is about how the pieces fit together under those constraints.
+Running a PDF engine inside a single Cloudflare Worker request means giving up a lot of things you'd normally reach for — `eval`, headless Chromium, Node's filesystem, most of the npm ecosystem that assumes any of those exist. The payoff is sub-second renders for typical documents — no browser boot, no cold-start penalty — and hosting costs that round to zero at idle.
 
 This is the fourth and last of the series. [Post 1](/four-goes-at-the-same-idea) is the long history — four product attempts going back to 2011. [Post 2](/the-builder-i-didnt-build) is about the AI pivot. [Post 3](/catalog-dsl-skill) is about the catalog / DSL / skill-file architecture. This one is the runtime deep-dive.
 

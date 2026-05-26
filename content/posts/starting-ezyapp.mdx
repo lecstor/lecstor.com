@@ -1,0 +1,42 @@
+---
+title: "Starting EzyApp"
+date: "2026-05-26"
+slug: "starting-ezyapp"
+description: "My latest project. A web app builder where the AI writes the app, built on the pieces that worked in makesPDF and a couple of other projects."
+tags: ["ezyapp", "architecture", "announce"]
+draft: false
+---
+
+I registered ezyapp.com in 2005, while I was still working with EzyDVD. The business had grabbed ezygames.com around the same time, and I was poking around the registrar when I noticed ezyapp was free.. so I grabbed it too, on the off-chance it'd be useful one day. Twenty years later, it is.
+
+EzyApp is my latest project. A web app builder where you (or your AI) describe what you want and EzyApp turns it into a real web app hosted on its own subdomain. It borrows hard from the pieces that worked in [makesPDF](https://makespdf.com) and a couple of other projects.
+
+## What it is
+
+You describe a web app. The AI writes it as a small DSL (builder-function calls like `page(...)`, `text(...)`, `nav(...)`). EzyApp runs the DSL in a sandbox, gets back a content tree, renders that server-side on Cloudflare Workers, and serves the result at `<your-app>.ezyapp.com`. Each app is fully isolated.. three D1s per app for app definition, runtime data, and a preview twin, plus one shared platform DB across the lot.
+
+Authoring happens through an MCP server (so Claude Code or Cursor can drive it directly) or a REST API. We'll also include an embedded chat in an authoring console for accounts that don't want to bring their own AI client.
+
+## Why now
+
+A few things lined up.
+
+The first is [makesPDF](/four-goes-at-the-same-idea). That project landed the bit I'd been chewing on for a while, that the AI is a better authoring surface than a drag-and-drop builder for a constrained-output system, *if* the system has a real schema and a way to validate against it. The builder I didn't build for PDFs, I'm now not building for web apps either. (For exactly the same reasons. Drag-and-drop is a lot of work; AI plus catalog plus DSL is a lot less.)
+
+The second is a couple of older projects I'd been carrying around that fit together better than I expected:
+
+- **bildar**, a `ContentNode` JSON DSL plus a React renderer and a component registry I built across 2024 and 2025. Originally aimed at drag-and-drop website editing (the same dead end I just talked about). The renderer and the substrate are the salvageable bits..
+- **courses-app**, an experiment in AI-agent authoring with Device Authorization Flow, sandboxed DSL execution, and an xAPI event store. The agent-authoring scaffolding mostly drops in without much rework.
+- **photogapp**, a multi-tenant SaaS I built. The binding-pool pattern, the platform DB, the migration fan-out script.. those are the multi-tenant chassis EzyApp sits on.
+
+EzyApp is what you get when you take the catalog-and-DSL idea from makesPDF, the agent-authoring scaffolding from courses-app, the multi-tenant chassis from photogapp, and the renderer from bildar, and write the glue between them.
+
+## Cost shape
+
+makesPDF's runtime story (single Worker bundle, near-zero idle cost, pay-per-request) is the same runtime story here. EzyApp is the same shape applied to a wider problem, instead of producing a PDF, you produce a hosted multi-page app. The cost properties carry over. An EzyApp that nobody's using costs me almost nothing. So I can ship it and see what happens, without the slow monthly bleed that killed PDFUnicorn back in 2014.
+
+The other thing is that AI is a real authoring surface now, not a 2020-style chatbot. I can describe "a small-business catalogue with a contact form" and Claude Code over MCP can produce a working app I can preview and tweak.
+
+## Next
+
+The site at [ezyapp.com](https://ezyapp.com) has more detail. Future posts here will probably cover the multi-tenant chassis from photogapp (it has some sharp edges), the content-versioning model, and whatever falls out of building the embedded chat. For now: it exists, it has bones, and I'd like to see if the bigger version of the makesPDF shape finds customers any better than the original.
